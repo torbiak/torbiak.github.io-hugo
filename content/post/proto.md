@@ -7,7 +7,7 @@ description = "Everything I've needed to know about Proto."
 
 Dissatisfied with `explorer.exe`? Find drag-and-drop and manual window placement tedious? Like using the keyboard? Don't want to choose between the hundreds of Norton Commander clones? You should try [Proto](http://miechu.pl/proto/).
 
-Proto is a fast, weird, original, keyboard-controlled file manager written by Mieszko Lassota. You get tabs, incremental subsequence filtering everywhere (eg. 'mp3' matches things like 'my panda <3' and 'badtimes.mp3'), renaming using regexes, an application launcher, and a nifty way to select groups of files, even if they're across filters or directories.
+Proto is a fast, weird, original, keyboard-controlled file manager written by Mieszko Lassota. You get tabs, incremental subsequence filtering everywhere (eg. 'mp3' matches things like 'my panda &lt;3' and 'badtimes.mp3'), renaming using regexes, an application launcher, and a nifty way to select groups of files, even if they're across filters or directories.
 
 ## Install
 
@@ -29,7 +29,7 @@ Once it's running you can call up the Proto window by pressing **Alt-\`** (that'
 
 **Ctrl-w** closes a tab.
 
-**Ctrl-tab**, **ctrl-shift-tab**, **ctrl-<arrow>**, and **ctrl-<number>** let you select tabs. **Ctrl-shift-<arrow>** reorders a tab.
+**Ctrl-tab**, **ctrl-shift-tab**, **ctrl-&lt;arrow&gt;**, and **ctrl-&lt;number&gt;** let you select tabs. **Ctrl-shift-&lt;arrow&gt;** reorders a tab.
 
 ## Navigate
 
