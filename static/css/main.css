@@ -184,3 +184,8 @@ header time {
   font-weight: 300;
   font-style: italic;
 }
+
+@font-face {
+  font-family: "Go Mono";
+  src: url("/font/go_mono.ttf");
+}
