@@ -127,4 +127,6 @@ If an expression isn't behaving as expected `-exec` or `-printf` can be used to 
     pruning ./cache
     ./foo
 
+## There's more
+
 Once I understood the basic concept of the expression language the manpage became a good reference. Check it out to discover other useful tests and actions. Some of my favourite POSIX-specified predicates are `-perm`, `-user`, and `-size`, and I frequently use the GNU extensions `-maxdepth`, `-mmin`, `-regex`, and `-ls`. Happy finding.
