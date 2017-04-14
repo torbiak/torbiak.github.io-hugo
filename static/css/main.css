@@ -138,54 +138,64 @@ header time {
 
 @font-face {
   font-family: "Bariol Serif";
-  src: url("/font/bariol_serif_regular.woff");
+  src: local("Bariol Serif Regular"),
+    url("/font/bariol_serif_regular.woff");
   font-weight: 400;
   font-style: normal;
 }
 @font-face {
   font-family: "Bariol Serif";
-  src: url("/font/bariol_serif_regular_italic.woff");
+  src: local("Bariol Serif Italic"),
+    url("/font/bariol_serif_regular_italic.woff");
   font-weight: 400;
   font-style: italic;
 }
 @font-face {
   font-family: "Bariol Serif";
-  src: url("/font/bariol_serif_thin.woff");
+  src: local("Bariol Serif Thin"),
+    url("/font/bariol_serif_thin.woff");
   font-weight: 100;
   font-style: normal;
 }
 @font-face {
   font-family: "Bariol Serif";
-  src: url("/font/bariol_serif_thin_italic.woff");
+  src: local("Bariol Serif Thin Italic"),
+    url("/font/bariol_serif_thin_italic.woff");
   font-weight: 100;
   font-style: italic;
 }
 @font-face {
   font-family: "Bariol Serif";
-  src: url("/font/bariol_serif_bold.woff");
+  src: local("Bariol Serif Bold"),
+    url("/font/bariol_serif_bold.woff");
   font-weight: 700;
   font-style: normal;
 }
 @font-face {
   font-family: "Bariol Serif";
-  src: url("/font/bariol_serif_bold_italic.woff");
+  src: local("Bariol Serif Bold Italic"),
+    url("/font/bariol_serif_bold_italic.woff");
   font-weight: 700;
   font-style: italic;
 }
 @font-face {
   font-family: "Bariol Serif";
-  src: url("/font/bariol_serif_light.woff");
+  src: local("Bariol Serif Light"),
+    url("/font/bariol_serif_light.woff");
   font-weight: 300;
   font-style: normal;
 }
 @font-face {
   font-family: "Bariol Serif";
-  src: url("/font/bariol_serif_light_italic.woff");
+  src: local("Bariol Serif Light Italic"),
+    url("/font/bariol_serif_light_italic.woff");
   font-weight: 300;
   font-style: italic;
 }
 
 @font-face {
   font-family: "Go Mono";
-  src: url("/font/go_mono.ttf");
+  src: local("Go Mono"),
+    local("GoMono"),
+    url("/font/go_mono.ttf");
 }
