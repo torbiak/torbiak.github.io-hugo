@@ -29,4 +29,4 @@ The tricky part was understanding exactly how X11 keyboard grabs work. X general
 
 Grabs also ended up being the downfall of the project: any full-featured desktop environment grabs the whole keyboard when opening a menu for a taskbar, menubar, or system tray, so that it can be navigated with the keyboard without changing the currently focused window. If ptrkeys already has the keyboard grabbed, the desktop environment's attempt to grab it fails and the menu typically doesn't open. This severely limits the applicability of ptrkeys. And it doesn't seem like there's a way around grabbing the whole keyboard either since a single-key grab becomes a whole-keyboard grab while it's active.
 
-So, while `ptrkeys` likely isn't useful for anyone using a desktop environment like GNONE, KDE, or XFCE, it might be for those using tiling window managers. [Check it out on github](https://github.com/torbiak/ptrkeys).
+So, while `ptrkeys` likely isn't useful for anyone using a desktop environment like GNOME, KDE, or XFCE, it might be for those using tiling window managers. [Check it out on github](https://github.com/torbiak/ptrkeys).
