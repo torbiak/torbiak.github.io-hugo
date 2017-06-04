@@ -1,4 +1,0 @@
-[submodule "public"]
-	path = public
-	url = git@github.com:torbiak/torbiak.github.io.git
-	branch = master
