@@ -58,11 +58,11 @@ ul.bulletless > li {
   list-style-type: none;
 }
 
-a {
+a, a code {
   color: #8c4b8c;
   text-decoration: none;
 }
-a:hover {
+a:hover, a code:hover {
   color: #8c4b4b;
 }
 /* Heading anchors. */

@@ -1,6 +1,6 @@
 #!/bin/bash
 set -eu
-hugo
+hugo --buildDrafts
 cd public
 git add -A
 git commit --amend -m 'init'
