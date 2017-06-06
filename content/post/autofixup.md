@@ -3,7 +3,6 @@ title = "Absorb changes across a topic branch in git"
 date = "2017-06-04"
 tags = ["git", "perl", "vcs"]
 description = "Use git-autofixup to automatically create fixup! commits for a topic branch."
-draft = true
 +++
 
 ## Motivation: tedious fixups
