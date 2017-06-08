@@ -93,7 +93,7 @@ Looking the code over, we realize we want to give `alternating_case` a docstring
 
 We'd like to squash these changes into the previous two commits. In this particular instance it'd be quite easy to do with two rounds of `git add --patch` followed by `git commit --fixup=:/<regex>`. but if the topic branch had more commits and we were fixing up more areas this process would get tedious. Let's see what `git-autofixup` does with it:
 
-    $ ../git-autofixup -vv @{upstream}
+    $ git-autofixup -vv @{upstream}
     ex.py @@ -5,16 +5,17 @@ has multiple targets
     656a790f|   5|    return ' '.join(words)    |     return ' '.join(words)
     656a790f|   6|                              |
