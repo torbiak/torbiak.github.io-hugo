@@ -5,7 +5,7 @@ tags = ["find", "cli", "unix", "shell"]
 description = "The important point that's difficult to glean from the manpage."
 +++
 
-## Confusion
+# Confusion
 
 I remember the first time I tried to use the `find` command on Linux, over a decade ago. I knew a substring of the name of a file I wanted to find, had found something on the web suggesting I use `find`, and was so disappointed when I couldn't just run `find $SUBSTR` to get my desired result. "Surely such a command exists," I thought. And it basically does, with `locate`, but I was searching directories that hadn't been indexed by `updatedb` and didn't know enough about globbing and quoting in `bash` to effectively give patterns to it. So I did some more searching on the web, learned I needed to give a `-name` predicate to `find`, and typed a lot of commands like the following over the next few years:
 
@@ -21,7 +21,7 @@ Much later, after reading the bash manpage a few times, among other things, I wr
         find . -iname "*${pattern}*" "$@" 2>/dev/null
     }
 
-## Beyond names
+# Beyond names
 
 Eventually I needed to find files based on their modification times and I started using the `-mtime` predicate. For example, to find files modified within the past 24 hours (`-mtime` takes units of 24 hours):
 
@@ -29,7 +29,7 @@ Eventually I needed to find files based on their modification times and I starte
 
 When using a condition like this that can match large numbers of uninteresting files it becomes obvious that further filtering is necessary. `egrep -v` can be used for this, but to avoid needlessly traversing directories and wasting time, using the `-prune` predicate for `find` is desirable. It was difficult to use properly without understanding find's little expression language, though.
 
-## Essence of expressions
+# Essence of expressions
 
 The `DESCRIPTION` in the manpage for GNU `find` makes sense now but it meant nothing to me in 2005. "...evaluating the given expression from left to right, according to the rules of precedence, until the outcome is known, at which point `find` moves on to the next file name." All it means, though, is that you give `find` a boolean expression composed of predicates and operators, and each file will get tested against it. Each predicate evaluates to true or false, and they are combined with the AND (`-a`) and OR (`-o`) operators. I don't remember how I came to understand this, but the best explanation I've seen is in chapter 9 of [Unix Power Tools](http://shop.oreilly.com/product/9780596003302.do).
 
@@ -63,7 +63,7 @@ This expression and its evaluation can be represented in a C-inspired syntax:
 
 `find` reads the current directory, gets `bar`, tests it against `-name foo`, which evaluates to false, and short-circuits on the `-a` operator, continuing on to `foo`, which tests true with `-name foo` and so gets printed by `-print`.
 
-## Prune
+# Prune
 
 Back to `-prune`. We're still searching for `foo`, but let's say there's also a directory we don't want to descend into called `cache`. There's a file called `foo` in it so it's easier to tell if it's getting searched.
 
@@ -97,7 +97,7 @@ Here's the expression in C-inspired syntax:
     
 Let's run through this. When `find` is testing `cache`, `-name cache` returns true, so `-prune` gets run, which removes `cache` from the list of directories to descend into and returns true. The return value of the whole expression is then known because the left side of the OR (`-o`) is true, so `find` moves onto the next file. When testing `foo`, `-name cache` returns false, failing the left side of the OR, so `find` moves to the right side where `-name foo` returns true, resulting in `./foo` being printed.
 
-## Default action
+# Default action
 
 If an expression doesn't print or execute anything `find` treats it as if it were surrounded in parentheses and followed by a print action: `( EXPR ) -print`. For example, if we remove `-print` from the previous command:
 
@@ -107,7 +107,7 @@ If an expression doesn't print or execute anything `find` treats it as if it wer
 
 `cache` gets printed because `-prune` returns true, making the overall expression true for it.
 
-## Parens
+# Parens
 
 As with many expression languages, parentheses can be used to force precedence. They need to be escaped or quoted so the shell doesn't treat them specially:
 
@@ -115,7 +115,7 @@ As with many expression languages, parentheses can be used to force precedence. 
     ./bar
     ./foo
 
-## Troubleshooting
+# Troubleshooting
 
 If an expression isn't behaving as expected `-exec` or `-printf` can be used to visualize what's actually happening. If portability is important, note that `-printf` is a GNU extension and isn't specified in [POSIX](http://pubs.opengroup.org/onlinepubs/9699919799/utilities/find.html).
 
@@ -127,6 +127,6 @@ If an expression isn't behaving as expected `-exec` or `-printf` can be used to 
     pruning ./cache
     ./foo
 
-## There's more
+# There's more
 
 Once I understood the basic concept of the expression language the manpage became a good reference. Check it out to discover other useful tests and actions. Some of my favourite POSIX-specified predicates are `-perm`, `-user`, and `-size`, and I frequently use the GNU extensions `-maxdepth`, `-mmin`, `-regex`, and `-ls`. Happy finding.

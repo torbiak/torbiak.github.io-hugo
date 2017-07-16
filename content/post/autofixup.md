@@ -5,13 +5,13 @@ tags = ["git", "perl", "vcs"]
 description = "Use git-autofixup to automatically create fixup! commits for a topic branch."
 +++
 
-## Motivation: tedious fixups
+# Motivation: tedious fixups
 
 Here's the situation. I'm working on a feature and end up with a chain of commits that depend on each other. It'd be easier for me as the author to put all the work in a single commit, but I like telling stories with my commits to (hopefully) make reviewing the branch easier and the history more meaningful in general. Anyway, the review goes back and forth for a while, motivating a bunch of small edits that are logically most connected to various commits. I commit these edits separately and then squash/fixup them all with an interactive rebase. Now, assigning changes to commits representing logical groups of changes was fun/challenging the first time, but assigning these small edits borne of review feedback is nearly a mechanical process of scanning through the list of topic branch commits and copy-pasting SHAs. [Or, more conveniently, using `git commit --fixup=:/<regex>`, although I haven't thought to do that until recently.]
 
 Personal and team git workflows apparently vary wildly, so not everyone has dealt with this situation, but I've encountered it with enough regularity that when I read the description of Facebook's [`hg absorb`](https://bitbucket.org/facebook/hg-experimental/src/abee33554ccf744c852b14876d1d2069e3fe22d2/hgext3rd/absorb/__init__.py?at=default&fileviewer=file-view-default) command in these [Mercurial sprint notes](https://groups.google.com/forum/#!topic/mozilla.dev.version-control/nh4fITFlEMk) I was super envious. To cure my envy I wrote [`git-autofixup`](https://github.com/torbiak/git-autofixup).
 
-## How it works
+# How it works
 
 `git-autofixup` parses hunks of changes in the working directory out of `git diff` output and uses `git blame` to assign those hunks to commits in `<revision>..HEAD`, which will typically represent a topic branch, and then creates fixup commits to be used with `git rebase --interactive --autosquash`.
 
@@ -23,7 +23,7 @@ By default a hunk will be included in a fixup commit if the hunk's context shows
 
 Slightly stricter assignment criteria are also available for when you're untangling fixups from changes for a new commit: see the description of the `--strict` option in the `--help`.
 
-## Example
+# Example
 
 `git-autofixup` is most useful on big projects, in big teams, on long-lived topic branches, but I've tried to concoct a small example that motivates its use. Say we have a little python library that for whatever reason transforms a given name so the letters of the last word of the name alternate between upper and lower case:
 
@@ -153,6 +153,6 @@ Finally, we do a `git rebase --interactive --autosquash` and see git has set the
     pick 5be3a3b Add odd_word_alternating_case function
     fixup 1a6c084 fixup! Add odd_word_alternating_case function
 
-## Where to get it
+# Where to get it
 
 Check it out on [GitHub](https://github.com/torbiak/git-autofixup) or the [CPAN](https://metacpan.org/pod/distribution/App-Git-Autofixup/git-autofixup). It can be installed using a CPAN client or by simply downloading the self-contained script, [`git-autofixup`](https://raw.githubusercontent.com/torbiak/git-autofixup/master/git-autofixup), to a directory in `PATH`.
