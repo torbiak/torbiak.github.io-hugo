@@ -7,10 +7,10 @@
 <hr>
 <nav>
 {{if .PrevInSection}}
-  <p>Previous: <a href="{{.PrevInSection.Permalink}}">{{.PrevInSection.Title}}</a></p>
+  <p>Previous: <a href="{{.PrevInSection.RelPermalink}}">{{.PrevInSection.Title}}</a></p>
 {{end}}
 {{if .NextInSection}}
-  <p>Next: <a href="{{.NextInSection.Permalink}}">{{.NextInSection.Title}}</a></p>
+  <p>Next: <a href="{{.NextInSection.RelPermalink}}">{{.NextInSection.Title}}</a></p>
 {{end}}
 </nav>
 {{partial "footer.html" .}}
