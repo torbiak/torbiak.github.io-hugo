@@ -87,6 +87,10 @@ hr {
   margin: 1rem 0;
 }
 
+.footnotes {
+  font-size: 85%;
+}
+
 /* Post header. */
 #PageTitle { font-size: 150%; }
 header time {
@@ -136,6 +140,10 @@ section.posts a {
 /* Post header. */
 header time {
   font-size: 80%;
+}
+
+#TableOfContents {
+  margin-top: 0.5rem;
 }
 
 

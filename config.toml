@@ -1,5 +1,6 @@
 title = "Jordan Torbiak"
 baseURL = "http://torbiak.com/"
 googleAnalytics = "UA-97065292-1"
+footnoteReturnLinkContents = "^"
 [params]
   author = "Jordan Torbiak"
