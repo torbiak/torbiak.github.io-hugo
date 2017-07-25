@@ -4,6 +4,7 @@ date = "2017-07-16"
 tags = ["data", "visualization", "gnuplot", "python", "perl", "numpy", "matplotlib", "charting", "time"]
 description = "A tutorial on creating time-binned histogram charts using Gnuplot and matplotlib, and some of the tradeoffs between the two tools."
 toc = true
+images = ["/post/histogram_gnuplot_vs_matplotlib/preview.png"]
 +++
 
 # Introduction
