@@ -17,9 +17,9 @@ I wanted to learn a charting tool that is:
 - fast enough to visualize large datasets, maybe millions of points
 - scriptable, so chart source code plays well with version control
 
-Without doing much research on the options I decided to start with the venerable Gnuplot. Data I've needed to analyze at previous jobs have always been time-series, so I chose visualizing my bash history as a practice task. After working through a series of charts of increasing sophistication with Gnuplot I started worrying that other tools might be more convenient, so I replicated my Gnuplot journey with matplotlib. I've been disappointed with the resources I've found for charting time-series data in both Gnuplot and matplotlib, motivating me to share my experience.
+Without doing much research on the options I decided to start with the venerable Gnuplot. Data I've needed to analyze at previous jobs have always been time-series, so I chose visualizing my bash history as a practice task. After working through a series of charts of increasing sophistication with Gnuplot I started worrying that other tools might be more convenient, so I replicated my Gnuplot journey with matplotlib. In the end my worries were unfounded and I'm actually pretty happy with Gnuplot, especially for quick-and-dirty jobs. matplotlib certainly has some advantages, like having a popular, sensible language like Python as its interface, and possibly being an alternative to R when used along with numpy, but given my weakness to one-liners Gnuplot is difficult to resist.
 
-In the end my worries were unfounded and I'm actually pretty happy with Gnuplot, especially for quick-and-dirty jobs. matplotlib certainly has some advantages, like having a popular, sensible language like Python as its interface, and possibly being an alternative to R when used along with numpy, but given my weakness to one-liners Gnuplot is difficult to resist. Read on for the details.
+I've been disappointed with the resources I've found for charting time-series data in both Gnuplot and matplotlib, motivating me to share my experience.
 
 # The data
 
