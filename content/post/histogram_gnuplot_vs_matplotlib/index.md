@@ -5,6 +5,7 @@ tags = ["data", "visualization", "gnuplot", "python", "perl", "numpy", "matplotl
 description = "A tutorial on creating time-binned histogram charts using Gnuplot and matplotlib, and some of the tradeoffs between the two tools."
 toc = true
 images = ["/post/histogram_gnuplot_vs_matplotlib/preview.png"]
+aliases = ["/post/gnuplot_time_series_histogram_tutorial/"]
 +++
 
 Update 2017-08-15: Added an [appendix](#appendix-pandas) discussing the use of [pandas](http://pandas.pydata.org/pandas-docs/stable/index.html).

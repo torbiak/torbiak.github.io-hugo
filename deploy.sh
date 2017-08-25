@@ -1,5 +1,6 @@
 #!/bin/bash
 set -eu
+git -C public clean -xfd
 hugo --buildDrafts
 cd public
 git add -A
