@@ -135,6 +135,11 @@ footer a:first-child {
 section.posts a {
   text-decoration: none;
 }
+section.posts time {
+  font-size: 70%;
+  margin-right: 0.2rem;
+  font-family: "Go Mono", monospace;
+}
 
 
 /* Post header. */
