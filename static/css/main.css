@@ -50,12 +50,18 @@ pre > code {
   color: inherit;
 }
 
-ul {
-  margin-top: 0;
+ol, ul {
   padding-left: 1rem;
 }
-ul.bulletless > li {
+ul ul {
+  margin: 0;
+}
+.list-unstyled {
+  padding: 0;
+}
+.list-unstyled > li {
   list-style-type: none;
+  margin: 0.6rem 0;
 }
 
 a, a code {
@@ -95,8 +101,8 @@ hr {
 #PageTitle { font-size: 150%; }
 header time {
   color: #406a95;
+  font-size: 80%;
 }
-
 
 /* Header. */
 a.siteTitle {
@@ -141,11 +147,6 @@ section.posts time {
   font-family: "Go Mono", monospace;
 }
 
-
-/* Post header. */
-header time {
-  font-size: 80%;
-}
 
 #TableOfContents {
   margin-top: 0.5rem;
