@@ -1,5 +1,5 @@
 +++
-title = "Failing to Write Useful Mouse Keys for X11"
+title = "Failing to write useful mouse keys for X11"
 date = "2017-03-07"
 tags = ["X11", "linux", "keyboard", "trackpad"]
 description = "My mouse keys daemon turned out less useful than expected because of X11's keyboard grab semantics."

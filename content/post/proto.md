@@ -1,5 +1,5 @@
 +++
-title = "File Management on Windows with Proto"
+title = "File management on Windows with Proto"
 date = "2017-03-06"
 tags = ["windows", "tools"]
 description = "Everything I've needed to know about Proto."

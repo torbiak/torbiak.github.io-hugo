@@ -1,5 +1,5 @@
 +++
-title = "Finding find: Grasping Its Simple Expression Language"
+title = "Finding find: grasping its simple expression language"
 date = "2017-03-08"
 tags = ["find", "cli", "unix", "shell"]
 description = "The important point that's difficult to glean from the manpage."
