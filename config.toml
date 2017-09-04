@@ -4,3 +4,5 @@ googleAnalytics = "UA-97065292-1"
 footnoteReturnLinkContents = "^"
 [params]
   author = "Jordan Torbiak"
+  description = "Articles, projects, and whatnot."
+  card_image = "img/card.png"
