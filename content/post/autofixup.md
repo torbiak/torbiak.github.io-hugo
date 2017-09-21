@@ -39,7 +39,7 @@ Slightly stricter assignment criteria are also available for when you're untangl
         words[-1] = ''.join(letters)
         return ' '.join(words)
 
-A new function is required that alternates the case of the letters in every other word of a given string, so we start a topic branch and have it track `master`. Before we start writing `odd_words_alternate_case`, though, we realize some of the logic needed can be factored out of `last_name_alternating_case`. So we do that and make a commit with the summary `Factor out alternating_case function`. The file is now:
+A new function is required that alternates the case of the letters in every other word of a given string, so we start a topic branch and have it track `master`. Before we start writing `odd_words_alternating_case`, though, we realize some of the logic needed can be factored out of `last_name_alternating_case`. So we do that and make a commit with the summary `Factor out alternating_case function`. The file is now:
 
     def last_name_alternating_case(name):
         """Return name, but with the last word in aLtErNaTiNg case."""
@@ -56,7 +56,7 @@ A new function is required that alternates the case of the letters in every othe
                 letters[i] = char.lower()
         return ''.join(letters)
 
-Now we're ready to write `odd_words_alternate_case` using `alternating_case`, and commit it as `Add odd_words_alternating_case`:
+Now we're ready to write `odd_words_alternating_case` using `alternating_case`, and commit it as `Add odd_words_alternating_case`:
 
     def odd_words_alternating_case(s):
         """Returns the string with alternating words in alternating case."""
