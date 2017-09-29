@@ -5,7 +5,7 @@ tags = ["notetaking"]
 description = "How can I avoid mistakenly dismissing an approach that would work?"
 +++
 
-Recently I've noticed a few cases where I've been solving a problem and determined that some approach doesn't work, only to get stuck on other approaches too and finally return to the supposedly broken approach and realize that it actually works. Occasionally I'll explicitly set out to rewrite a piece of broken code using the same approach and it'll work and I can compare the two, but for most problems the history will be gone and I'm left wondering what I was doing wrong before. 
+Recently I've noticed a few cases where I've been solving a problem and determined that some approach doesn't work, only to get stuck on other approaches too and finally return to the supposedly broken approach and realize that it actually works. Occasionally I'll explicitly set out to rewrite a piece of broken code using the same approach and it'll work and I can compare the two, but for most problems the history will be gone and I'm left wondering what I was doing wrong before.
 
 This doesn't only happen for programming problems, either. I was searching through my journal looking for something else yesterday and happened to see an unsuccessful skin-care regime I undertook about a year ago. It called for the use of two products and I followed it for a week but it worsened my skin's condition so much that I stopped. A few months ago I started using one of the products alone, having completely forgotten about my prior experience, and it proved super effective. I likely could have seen those results a year earlier if I'd changed one variable at a time and hadn't conflated the failure of the combo with the failure of each individually.
 
