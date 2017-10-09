@@ -1,14 +1,22 @@
 +++
-title = "Time-series histograms: Gnuplot vs matplotlib"
+title = "Time-series histograms: gnuplot vs matplotlib"
 date = "2017-07-16"
 tags = ["data", "visualization", "gnuplot", "python", "perl", "numpy", "matplotlib", "charting", "time"]
-description = "A tutorial on creating time-binned histogram charts using Gnuplot and matplotlib, and some of the tradeoffs between the two tools."
+description = "A tutorial on creating time-binned histogram charts using gnuplot and matplotlib, and some of the tradeoffs between the two tools."
 toc = true
 images = ["/post/histogram_gnuplot_vs_matplotlib/preview.png"]
 aliases = ["/post/gnuplot_time_series_histogram_tutorial/"]
 +++
 
-Update 2017-08-15: Added an [appendix](#appendix-pandas) discussing the use of [pandas](http://pandas.pydata.org/pandas-docs/stable/index.html).
+**Update 2017-08-15**: Added an [appendix](#appendix-pandas) discussing the use of [pandas](http://pandas.pydata.org/pandas-docs/stable/index.html).
+
+**Update 2017-10-09**:
+
+- Added a nice way to make a stacked bar chart for multiple distributions using gnuplot, after discovering the `sum [min:max:step] <expr>` syntax.
+- Added `help` commands to be entered at the gnuplot prompt for easier access to relevant documentation.
+- Added the excellent [Gnuplot in Action](https://www.manning.com/books/gnuplot-in-action-second-edition) as an important resource for learning gnuplot.
+- Removed discussion of colour in gnuplot as it's mostly irrelevant to the task at hand and there's several good ways to change colours that aren't difficult to find. See `help colors`.
+- Made the "sum" line more distinct by making it dotted.
 
 # Introduction
 
@@ -18,9 +26,13 @@ I wanted to learn a charting tool that is:
 - fast enough to visualize large datasets, maybe millions of points
 - scriptable, so chart source code plays well with version control
 
-Without doing much research on the options I decided to start with the venerable Gnuplot. Data I've needed to analyze at previous jobs have always been time-series, so I chose visualizing my bash history as a practice task. After working through a series of charts of increasing sophistication with Gnuplot I started worrying that other tools might be more convenient, so I replicated my Gnuplot journey with matplotlib. In the end my worries were unfounded and I'm actually pretty happy with Gnuplot, especially for quick-and-dirty jobs. matplotlib certainly has some advantages, like having a popular, sensible language like Python as its interface, and possibly being an alternative to R when used along with numpy, but given my weakness to one-liners Gnuplot is difficult to resist.
+Without doing much research on the options I decided to start with the venerable gnuplot. Data I've needed to analyze at previous jobs have always been time-series, so I chose visualizing my bash history as a practice task. After working through a series of charts of increasing sophistication with gnuplot I started worrying that other tools might be more convenient, so I replicated my gnuplot journey with matplotlib. In the end my worries were unfounded and I'm actually pretty happy with gnuplot, especially for quick-and-dirty jobs. matplotlib certainly has some advantages, like having a popular, sensible language like Python as its interface, and possibly being an alternative to R when used along with [pandas](http://pandas.pydata.org/pandas-docs/stable/index.html), but gnuplot's brevity is difficult to resist.
 
-I've been disappointed with the resources I've found for charting time-series data in both Gnuplot and matplotlib, motivating me to share my experience.
+I've been disappointed with the resources I've found for charting time-series data in both gnuplot and matplotlib, motivating me to share my experience.
+
+If you're less interested in the progression and just want to see how I'd recommend making a chart like the below from a timestamped log, skip [here](#multiple-distributions-stacked-bars).
+
+![shellhist_gp_stackedbars.svg](/post/histogram_gnuplot_vs_matplotlib/shellhist_gp_stackedbars.svg)
 
 # The data
 
@@ -38,29 +50,29 @@ I'm examining my `bash` history to see when I've been most active over the past 
     10222  2017-07-01T09:53:36 rm App-Git-Autofixup-0.002003.tar.gz
     10223  2017-07-01T09:53:38 fg
 
-# Gnuplot
+# gnuplot
 
 ## A rough start: points
 
-To get a rough visualization of when commands were entered we can tell Gnuplot we're dealing with time data on the x-axis by setting `xdata time` and `timefmt` and plot each command as a point, spreading the points across the y-axis at random to make it easier to get a sense of their density. Gnuplot interprets `using 2:(rand(0))` to mean that we're using the second column of `shellhist` for the x-values, and random floats in the interval [0:1] as the y-values. The parentheses around `rand(0)` are necessary to signal that we want to use the value of an expression instead of selecting a column from the data file.[^using]
+To get a rough visualization of when commands were entered we can tell gnuplot we're dealing with time data on the x-axis by setting `xdata time` and `timefmt` and plot each command as a point, spreading the points across the y-axis at random to make it easier to get a sense of their density. gnuplot interprets `using 2:(rand(0))` to mean that we're using the second column of `shellhist` for the x-values, and random floats in the interval [0:1] as the y-values. The parentheses around `rand(0)` are necessary to signal that we want to use the value of an expression instead of selecting a column from the data file.[^using]
 
-`shellhist_gp_points.gnuplot`:
+`shellhist_gp_points.gp`:
 
     set xdata time
     set timefmt "%Y-%m-%dT%H:%M:%S"
     plot 'shellhist' using 2:(rand(0)) with points
 
-Plot the script using a command like:
+Plot the script from the gnuplot prompt with `load 'shellhist_gp_points.gp'` or using a shell command like:
 
-    GNUTERM=svg gnuplot shellhist_gp_points.gnuplot >shellhist_gp_points.svg
+    GNUTERM=svg gnuplot shellhist_gp_points.gp >shellhist_gp_points.svg
 
 ![shellhist_gp_points.svg](/post/histogram_gnuplot_vs_matplotlib/shellhist_gp_points.svg)
 
 ## Binning times
 
-The above chart gives a rough idea of when I was executing commands, but it'd be interesting to get more specific and quantify how many commands I was running per hour or minute. To do that we need to put entries in bins, mapping the command timestamps to intervals of the desired length. If we're glancing at the manual we might think that the `histograms` plotting style does what we want, but it doesn't: it expects data to already be binned. We need to bin the data some other way; we could use a different tool or programming language, or we can use the `smooth frequency` modifier for Gnuplot's `using` clause, which adds ups the y-values for each unique x-value encountered.[^smooth] So if we can get the time values as [epoch seconds](https://en.wikipedia.org/wiki/Unix_time), round them to the start of the interval[^leap] they're in, and set the y-values as `1.0`, then `smooth frequency` will add up those ones, creating the needed mapping of interval start times to number of commands executed.
+The above chart gives a rough idea of when I was executing commands, but it'd be interesting to get more specific and quantify how many commands I was running per hour or minute. To do that we need to put entries in bins, mapping the command timestamps to intervals of the desired length. If we're glancing at the manual we might think that the `histograms` plotting style does what we want, but it doesn't: it expects data to already be binned. We need to bin the data some other way; we could use a different tool or programming language, or we can use the `smooth frequency` modifier for gnuplot's `using` clause, which adds ups the y-values for each unique x-value encountered.[^smooth] So if we can get the time values as [epoch seconds](https://en.wikipedia.org/wiki/Unix_time), round them to the start of the interval[^leap] they're in, and set the y-values as `1.0`, then `smooth frequency` will add up those ones, creating the needed mapping of interval start times to number of commands executed.
 
-Gnuplot represents times as epoch seconds[^time_repr] and since we've set `timefmt` and `xdata time` we might expect that referencing column 2 in the expression for the x-values would evaluate to epoch seconds, but it actually follows the usual behaviour and evaluates to the first number present in the field, 2017 in our case. We've specified that xdata is time-based, not that column 2 is only to be interpreted as a time. 
+gnuplot represents times as epoch seconds[^time_repr] and since we've set `timefmt` and `xdata time` we might expect that referencing column 2 in the expression for the x-values would evaluate to epoch seconds, but it actually follows the usual behaviour and evaluates to the first number present in the field, 2017 in our case. We've specified that xdata is time-based, not that column 2 is only to be interpreted as a time.
 
     # WRONG. $2 evaluates to 2017, not epoch seconds.
     set xdata time
@@ -70,7 +82,7 @@ Gnuplot represents times as epoch seconds[^time_repr] and since we've set `timef
 
 Instead we use the `timecolumn` function to get epoch seconds as a float. Most of the time we can rely on type coercion but to use the modulus (`%`) operator `t` needs to be converted to an int. Since `timecolumn` takes a format there's no need to set `timefmt` anymore. Also, we can avoid parsing the date twice and make the script more readable by defining a user-defined function we'll call `bin`.
 
-`shellhist_gp_line.gnuplot`:
+`shellhist_gp_line.gp`:
 
     set xdata time
 
@@ -91,13 +103,13 @@ If we look closely at the chart above there's a discontinuity on June 28, from 1
 If we wanted to share this chart there's a number of other worthwhile improvements:
 
 - Add a title.
-- Hide the legend ("key" in Gnuplot parlance), which is more distracting than useful in this case.
+- Hide the legend ("key" in gnuplot parlance), which is more distracting than useful in this case.
 - Include time of day in the x-axis labels.
 - Remove extraneous xtics, ytics, and border lines, depending on our preference.
 
 Histograms are commonly plotted using boxes, which is particularly nice when the boxes cover the x-axis intervals they represent. By default boxes are centered on their x-value, so we need to change the `bin` function to offset them slightly. Also, we'll need to set `boxwidth`, since by default adjacent boxes are extended until they touch.
 
-`shellhist_gp_bars.gnuplot`:
+`shellhist_gp_bars.gp`:
 
     binwidth = 3600 # 1h in seconds
     bin(t) = (t - (int(t) % binwidth) + binwidth/2)
@@ -107,7 +119,7 @@ Histograms are commonly plotted using boxes, which is particularly nice when the
 
     set boxwidth binwidth
 
-    set xtics format "%b %d %H:%M" time rotate 
+    set xtics format "%b %d %H:%M" time rotate
     set xtics nomirror
     set ytics nomirror
     set key off
@@ -121,15 +133,15 @@ Histograms are commonly plotted using boxes, which is particularly nice when the
 
 ## Multiple distributions with lines
 
-Plotting multiple distributions with lines is only slightly trickier. For this data plotting all possible series would clutter the chart severely, so we instead find the most frequent commands using Gnuplot's `system` function and a pipeline and only plot those. Then we use the `plot` command's `for` clause to iterate over the data for each of the top commands, binning each separately by using ternary operator in the using clause to count one command per iteration.
+Plotting multiple distributions with lines is only slightly trickier. For this data plotting all possible series would clutter the chart severely, so we instead find the most frequent commands using gnuplot's `system` function and a pipeline and only plot those. Then we use the `plot` command's `for` clause to iterate over the data for each of the top commands, binning each separately by using ternary operator in the using clause to count one command per iteration.
 
 If a line is missing columns then `stringcolumn(3)` will evaluate to `NaN` and a type error will be thrown when comparing it as a string to `cmd`. To avoid this we can clean up the file or use `valid` to check that a line has usable fields. `valid` only checks that columns aren't `NaN`, though, so we can't use it on string columns, as I was initially tempted to. `valid(3)` is always false since a string that don't contain numbers converts to `NaN` when coerced to a float.
 
-While I don't want to plot all the series for the sake of readability, I would like to know how many command executions aren't covered by the top few, so I've also plotted a line showing the overal number of commands run per hour. As shown in the last line of the example the previous datafile given to a `plot` command can be reused by specifying the empty string (`''`), 
+While I don't want to plot all the series for the sake of readability, I would like to know how many command executions aren't covered by the top few, so I've also plotted a line showing the overal number of commands run per hour. As shown in the last line of the example the previous datafile given to a `plot` command can be reused by specifying the empty string (`''`),
 
-Most Gnuplot command names and modifiers can be abbreviated as long as they're unambiguous, and I've taken advantage of this by writing `u` instead of `using` for the first `plot` clause to help reduce the line length. Abbreviations are regularly used in examples I've seen on the web.
+Most gnuplot command names and modifiers can be abbreviated as long as they're unambiguous, and I've taken advantage of this by writing `u` instead of `using` for the first `plot` clause to help reduce the line length. Abbreviations are regularly used in examples I've seen on the web.
 
-`shellhist_gp_stackedlines.gnuplot`:
+`shellhist_gp_stackedlines.gp`:
 
     fmt = "%Y-%m-%dT%H:%M:%S"
 
@@ -139,29 +151,36 @@ Most Gnuplot command names and modifiers can be abbreviated as long as they're u
     set xdata time
     set datafile missing NaN
 
-    set xtics format "%b %d %H:%M" time rotate
-    set xtics nomirror
+    set xtics format "%b %d %H:%M" time rotate nomirror
     set ytics nomirror
     set border 1+2 # Set the bits for bottom and left borders.
     set title 'Commands Run Per Hour'
 
 
-    top_commands = system("awk '{print $3}' shellhist \
-        | sort | uniq -c | sort -n | tail -n 5 | awk '{print $2}'")
+    top_cmds = system("awk '$3 ~ /^[a-zA-Z0-9_-]+$/{print $3}' shellhist \
+        | sort | uniq -c | sort -rn | awk '{print $2}' | sed 10q")
 
-    plot for [cmd in top_commands] 'shellhist' \
+    plot for [cmd in top_cmds] 'shellhist' \
         u (bin(timecolumn(2, fmt))):((valid(1) && strcol(3) eq cmd) ? 1 : NaN) \
-            smooth freq with linespoints title cmd, \
+            smooth freq with lines title cmd, \
         '' using (bin(timecolumn(2, fmt))):(1.0) \
-            smooth freq with linespoints title "sum"
+            smooth freq with lines title "sum" dashtype '..'
 
 ![shellhist_gp_stackedlines.svg](/post/histogram_gnuplot_vs_matplotlib/shellhist_gp_stackedlines.svg)
 
 ## Multiple distributions with stacked bars
 
-Plotting distributions using lines is convenient when making the chart, but if many distributions are involved the chart might be easier to read when plotted with stacked boxes/bars. While it's possible to create a stacked bar chart without reshaping the data it's awkward for more than a handful of series: the expressions get long and the plots must be precisely ordered so taller boxes don't completely obscure shorter ones. In the following script I'm using `@` macros[^macros] to shorten the plot command slightly, but it's still unweildly. Too error prone for my tastes. If Gnuplot's user-defined functions allowed some form of looping they could make this approach more feasible, but they can only contain a single expression and all Gnuplot looping constructs are parts of statements. 
+Plotting distributions using lines is convenient when making the chart, but if many distributions are involved the chart gets uncomfortably busy. Plotting the chart with stacked bars can make it easier to read.
 
-`shellhist_gp_stackedbars.gnuplot`:
+### Inline transformations
+
+Here we're using a similar approach as for the previous chart, using gnuplot expressions to transform the data so it's suitable for use with `smooth frequency`.
+
+The main complication is that we need to stack the bars ourselves, plotting sums of comamnd frequencies in descending order so taller bars don't completely obscure the short ones. To acheive that we plot the sum of a decreasing number of commands using a `sum`[^sum] expression. Each box will obscure just the bottom of the previous one, with the unobscured portion---that is, the difference between the sums---representing the frequency of the command.
+
+There are some minor changes, too, like the formatting options for the boxes, and setting the xtics to be `out` so they aren't obscured by the boxes. Also, since the series with the smallest overall frequencies are plotted first so they're at the top of the stack, I've explicitly chosen which linetypes to use with `linetype cmd` (`cmd` being used as a linetype index) so the nicer colours at the start of the sequence are used for the biggest boxes.
+
+`shellhist_gp_stackedbars.gp`:
 
     binwidth = 3600 # 1h in seconds
     bin(t) = (t - (int(t) % binwidth) + binwidth/2)
@@ -169,34 +188,43 @@ Plotting distributions using lines is convenient when making the chart, but if m
     set xdata time
     set datafile missing NaN
     set boxwidth binwidth
-    set xtics format "%b %d %H:%M" time rotate
-    set style fill pattern 1
+    set xtics format "%b %d %H:%M" time rotate out nomirror
+    set ytics nomirror
+    set style fill solid border lc rgb "black"
+    set border 3
+    set title "Commands run per hour"
+
+    top_cmds = system("awk '$3 ~ /^[a-zA-Z0-9_-]+$/{print $3}' shellhist \
+        | sort | uniq -c | sort -rn | awk '{print $2}' | sed 10q")
 
     time = '(bin(timecolumn(2, "%Y-%m-%dT%H:%M:%S")))'
-    cmd = "stringcolumn(3)"
 
-    plot 'shellhist' u @time:((valid(1) && (@cmd eq 'gnuplot' || @cmd eq 'fg')) ? 1 : NaN) \
-            smooth freq w boxes t 'fg', \
-        '' u @time:((valid(1) && @cmd eq 'gnuplot') ? 1.0 : NaN) \
-            smooth freq w boxes t 'gnuplot'
+    plot for [cmd=words(top_cmds):1:-1] 'shellhist' \
+        u @time:(!valid(1) ? NaN : sum [i=1:cmd] strcol(3) eq word(top_cmds, i)) \
+        smooth freq w boxes t word(top_cmds, cmd) linetype cmd, \
+        '' u @time:(valid(1)) smooth freq w lines t 'sum' dashtype '..'
 
 ![shellhist_gp_stackedbars.svg](/post/histogram_gnuplot_vs_matplotlib/shellhist_gp_stackedbars.svg)
 
-So, if a stacked bar chart is needed, it seems better to bin the data and transpose the command names into columns of their own using a separate script, taking the data from this shape:
+### External reshaping
+
+An alternative method is to reshape the data using some other tool so gnuplot's histogram plot style can be used. For this data this approach is a lot more work than using inline transformations, but I bet there are situations where it's appropriate.
+
+We're taking the data from this shape:
 
     time        cmd
     <timestamp> sed
     <timestamp> awk
     ...
 
-To this:
+to this:
 
     time  sed awk
     <bin>   0   5
     <bin>   5   2
     ...
 
-I was almost able to reshape the data with [`mlr`](http://johnkerl.org/miller/doc/index.html) but ended up using perl. It's mostly a matter of counting frequencies per command for each bin, sorting the commands by frequency using a [Schwartzian transform](https://en.wikipedia.org/wiki/Schwartzian_transform) so it's easy to print the top N commands, and then printing out all the bins.
+I was almost able to reshape the data with [`mlr`](http://johnkerl.org/miller/doc/index.html) but ended up using perl. It's mostly a matter of counting frequencies per command for each bin, sorting the commands by frequency using a [Schwartzian transform](https://en.wikipedia.org/wiki/Schwartzian_transform) so it's easy to print the top N commands, and then printing out all the bins. See the [appendix about pandas](#appendix-pandas) for a far more concise way to do this.
 
 `bin.pl`:
 
@@ -257,39 +285,35 @@ Producing data like:
     2017-06-28T00:00:00 10 7 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0 0 1 0 0 0 0
     ...
 
-Now the `histogram` plot type can be used with Gnuplot. `set style histogram rowstacked` asks for stacked bars instead of the default clustered bars, which don't work well with a large number of bins like we have here.
+Now the `histogram` plot type can be used. First off, we'll `set style histogram rowstacked` to get stacked bars instead of the default clustered bars, which don't work well with a large number of bins like we have here.
 
-The x-axis labels require a different approach from before. Histograms in Gnuplot don't work with `set xdata time`, so the data needs to contain all the bins we want plotted, including empty ones. If the times in the datafile aren't in the presentation format desired, the x-axis tick labels can be formatted by giving an `xticlabels()` specification in the `using` clause and parsing and reformatting the dates using the `strptime` and `strftime` functions. Unfortunately, the usual methods of setting major and minor tick frequency, `set xtics <num>` and `set mxtics <num>`, don't work with `xticlabels`, but we can get a fair bit of control using an expression that returns either a string or `NaN` to choose which labels to show, like in the `xlabel` function below, which uses chained ternary operators to print a labelled tick every 6 hours and to fake minor ticks by making a tick with an empty label 3 hours between the labelled ones.
+The x-axis labels require a different approach from before. Lines of histogram data are implicitly plotted at x = 1, 2, 3, etc., so `set xdata time` isn't applicable and the data needs to contain all the bins we want plotted, including empty ones. If the times in the datafile aren't in the presentation format desired, the x-axis tick labels can be formatted by giving an `xticlabels()` specification in the `using` clause and parsing and reformatting the dates using the `strptime` and `strftime` functions. Since the x-axis range doesn't represent times we need to use `xticlabels()` to get useful labels from the data itself. Unfortunately, this means there won't be automatically-spaced major ticks, which are required for the automatic placement of minor ticks, and placing minor ticks manually is tricky. They can be placed using `set for x[<start>:<end>:<incr>] xtics add ('' x 1)`, but if an increment greater than 1 is used care must be taken to set the start so the minor ticks are aligned with the major ones, unless the data happens to start at a bin that's a multiple of the increment. For example, if we're using hour-long bins, major ticks are at midnight and noon, the first line of data (x=0) is for 8 o'clock, and we want a minor tick every 3 hours, we need to start the minor ticks at x=1---9 o'clock---instead, not at x=0, and calculating this programmatically is awkward. Alternatively, we can fake minor ticks by placing major ticks without labels, giving the empty string to `xticlabels()` at appropriate positions.
 
-We're using the Tableau10 colour series as defined in [`matplotlib.cm.tab10`](http://matplotlib.org/examples/color/colormaps_reference.html) by selecting "words" out of a string in the `color` function. It seems difficult to find more than about 10 easily distinguishable colours, so I'm only plotting the top 10. I couldn't confidently identify series when using Tableau20.
+The second plot clause prints the overall command frequency stored in the `sum` column and takes care of the xticlabels. Since the rest of the columns are command frequencies sorted in decreasing order we can easily plot the top N commands by changing the iteration conditions of the first clause.
 
-The first plot clause prints the overall command frequency stored in the `sum` column and takes care of the xticlabels. Since the rest of the columns are command frequencies sorted in decreasing order we can easily plot the top N commands by changing the iteration conditions of the second clause.
-
-`shellhist_gp_histogram.gnuplot`:
+`shellhist_gp_histogram.gp`:
 
     # Autotitle series in the key using columnheaders from the data file.
     set key autotitle columnheader
 
     set style histogram rowstacked
+    set style fill solid border lc rgb "black"
 
-    set xtics nomirror rotate
-    set mxtics 11
-    set style fill solid border -1
+    set xtics nomirror rotate out
 
-    color(i) = (word(tab10, i % words(tab10) + 1))
-    tab10 = "#8c564b #e377c2 #7f7f7f #bcbd22 #17becf \
-        #1f77b4 #ff7f0e #2ca02c #d62728 #9467bd"
+    set title "Commands run per hour"
 
     xlabel(time) = ( \
         t = strptime("%Y-%m-%dT%H:%M:%S", time), \
-        int(tm_hour(t)) % 12 == 0  ? strftime("%b %d %H00", t) \
-        : int(tm_hour(t)) % 3 == 0 ? "" \
+        int(tm_hour(t)) % 12 == 0  ? strftime("%b %d %H:00", t) \
+        : int(tm_hour(t)) % 3 == 0 ? '' \
         :                            NaN \
     )
 
     topN = 10
-    plot 'shellhist_binned' u "sum":xtic(xlabel(strcol(1))) w lines, \
-        for [i=3:(3+topN-1)] '' using i with histogram linecolor rgb color(i)
+    plot for [i=3:(3+topN-1)] 'shellhist_binned' using i with histogram, \
+        '' u "sum":xtic(xlabel(strcol(1))) w lines dashtype '..'
+
 
 ![shellhist_gp_histogram.svg](/post/histogram_gnuplot_vs_matplotlib/shellhist_gp_histogram.svg)
 
@@ -305,7 +329,7 @@ Also, unless we want to display UTC times in our charts we need to give a timezo
 
 ## Points
 
-Let's start with the same type of chart as with Gnuplot, a point for each command executed, randomly-scattered from [0,1] across the y-axis. This gives a rough idea of when commands were executed. Getting the data out of the `shellhist` file is straight-forward but verbose compared to Gnuplot, and numpy is convenient for generating a large array of random y-values. Note I've been careful to convert the `datetime.datetime` objects resulting from parsing times to Unix time in UTC before converting them to matplotlib's time representation.[^diyfmt] 
+Let's start with the same type of chart as with gnuplot, a point for each command executed, randomly-scattered from [0,1] across the y-axis. This gives a rough idea of when commands were executed. Getting the data out of the `shellhist` file is straight-forward but verbose compared to gnuplot, and numpy is convenient for generating a large array of random y-values. Note I've been careful to convert the `datetime.datetime` objects resulting from parsing times to Unix time in UTC before converting them to matplotlib's time representation.[^diyfmt]
 
 `shellhist_mpl_points.py`:
 
@@ -335,7 +359,7 @@ Let's start with the same type of chart as with Gnuplot, a point for each comman
 
 ## Binning times
 
-matplotlib doesn't have anything like Gnuplot's `smooth frequency` filter (AFAIK), making it less convenient to do a quick-and-dirty line chart. It seems necessary to preprocess the data before plotting it. I looked at using numpy's `histogram` function or `matplotlib.axes.Axes.hist` but it seems easier to count the frequency per bin using a `defaultdict`.
+matplotlib doesn't have anything like gnuplot's `smooth frequency` filter (AFAIK), making it less convenient to do a quick-and-dirty line chart. It seems necessary to preprocess the data before plotting it. I looked at using numpy's `histogram` function or `matplotlib.axes.Axes.hist` but it seems easier to count the frequency per bin using a `defaultdict`.
 
 For bin widths that evenly divide a day, timestamps are most easily binned when represented as Unix time since every day is defined to have exactly 86400 seconds [according to POSIX](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_16) regardless of leap seconds and it's easy to use the modulus operator, `%`, on an integer to find the start of some number of seconds, minutes, or hours. Wheras rounding `datetime.datetime` instances seems to require cascading through the different units, and rounding matplotlib's days-since-0001-01-01 representation involves dealing with floats, which are tricky to compare or round reliably and thus a bad choice for dictionary keys.
 
@@ -362,7 +386,7 @@ For bin widths that evenly divide a day, timestamps are most easily binned when 
     unixtimes = list(sorted(freq_for.keys()))
     times = [epoch2num(t) for t in unixtimes]
     freqs = [freq_for[bin] for bin in unixtimes]
-    
+
     fig, ax = plt.subplots()
     fig.autofmt_xdate()
 
@@ -374,7 +398,7 @@ For bin widths that evenly divide a day, timestamps are most easily binned when 
 
 ## Improve readability
 
-Assuming we liked how the Gnuplot single-distribution line chart was styled, we can create a similar chart in matplotlib.
+Assuming we liked how the gnuplot single-distribution line chart was styled, we can create a similar chart in matplotlib.
 
 First, use `DateFormatter` and `HourLocator` objects instead of `Figure.autofmt_xdate` to choose xtick placement and labels:
 
@@ -410,7 +434,7 @@ We also:
     unixtimes = list(sorted(freq_for.keys()))
     times = [epoch2num(t) for t in unixtimes]
     freqs = [freq_for[bin] for bin in unixtimes]
-    
+
     fig, ax = plt.subplots()
 
     plt.xticks(rotation='vertical')
@@ -435,9 +459,9 @@ Binning is mostly the same as before, except we're filtering out commands that d
 
 The styling code in `save_chart` is almost the same as before, except `Axes.legend` is called between plotting all the series and saving the figure, since it generates a legend based on the series that have already been plotted.
 
-I've set the line/bar colors to be `tab10` using `Axes.set_prop_cycle` in `save_chart` just to show one way to change to them. [This example](http://matplotlib.org/examples/color/color_cycle_demo.html) show some other ways. `tab10` is the default colour cycle, so it's not actually doing anything.
+I've set the line/bar colours to be `tab10` using `Axes.set_prop_cycle` in `save_chart` just to show one way to change to them. [This example](http://matplotlib.org/examples/color/color_cycle_demo.html) show some other ways. `tab10` is the default colour cycle, so it's not actually doing anything.
 
-Plotting lines is straightforward, but plotting stacked bars requires a few extra steps. As with Gnuplot we've offset the times by half a `bin_width` and set the bar width so the bars cover the time interval on the x-axis they represent instead of being centered over it.  Also, we need to keep track of the where to plot the bottom of the bars and add the frequencies of each series to it; a numpy array is convenient and efficient for this since operations on an array apply to all of its elements.
+Plotting lines is straightforward, but plotting stacked bars requires a few extra steps. As with gnuplot we've offset the times by half a `bin_width` and set the bar width so the bars cover the time interval on the x-axis they represent instead of being centered over it.  Also, we need to keep track of the where to plot the bottom of the bars and add the frequencies of each series to it; a numpy array is convenient and efficient for this since operations on an array apply to all of its elements.
 
 `shellhist_mpl_multi.py`:
 
@@ -483,7 +507,7 @@ Plotting lines is straightforward, but plotting stacked bars requires a few extr
         bar_width = data.bin_width.seconds / 86400.0 # Fraction of a day.
 
         axes.plot(offset_times, data.totals,
-            linestyle='-', linewidth=0.2, label='sum')
+            linestyle='--', linewidth=0.4, label='sum')
 
         bottom = np.zeros(len(offset_times))
         for cmd in data.cmds[:10]:
@@ -493,7 +517,8 @@ Plotting lines is straightforward, but plotting stacked bars requires a few extr
 
     def plot_lines(axes, data):
         float_times = [epoch2num(t) for t in data.unix_times]
-        axes.plot(float_times, data.totals, linewidth=0.2, label='sum')
+        axes.plot(float_times, data.totals,
+            linestyle='--', linewidth=0.4, label='sum')
 
         for cmd in data.cmds[:10]:
             axes.plot(float_times, data.freqs_for[cmd], label=cmd)
@@ -554,13 +579,13 @@ Plotting lines is straightforward, but plotting stacked bars requires a few extr
 
 # Best resources for learning
 
-To learn more about Gnuplot I'd recommend reading [the manual](http://gnuplot.info/docs_5.0/gnuplot.pdf), skimming less relevant sections but paying particular attention to most of part 1 and the description of the `plot` command in part 3. Once these fundamental topics are understood I think the rest can be looked up as needed. At first glance the manual doesn't look like it's organized for a linear read but I was well-served by that approach. Looking through the collection of [demos](http://gnuplot.sourceforge.net/demo_5.0/) may also be helpful.
+For gnuplot I'd definitely recommend looking at [Gnuplot in Action](https://www.manning.com/books/gnuplot-in-action-second-edition), which is an amazing tutorial that teaches all the basics and a bunch of practical tricks. If you don't want to buy a book I'd recommend reading [the manual](http://gnuplot.info/docs_5.0/gnuplot.pdf), skimming less relevant sections but paying particular attention to most of part 1 and the description of the `plot` command in part 3. Once these fundamental topics are understood I think the rest can be looked up as needed. At first glance the manual doesn't look like it's organized for a linear read but I was well-served by that approach. The `help` command seems to provide all the content in the manual but conveniently indexed by topic and command, and I wish that I realized how good it was earlier, as I'm finding it far more convenient than referring to the manual. Looking through the collection of [demos](http://gnuplot.sourceforge.net/demo_5.0/) may also be helpful.
 
 I learned what I know about matplotlib by stumbling through the official docs, which was painful and inefficient. They're clearly written and comprehensive but it was difficult to find what I needed to do practical things. I suspect having such comprehensive API docs creates a [Worse is Better](https://www.jwz.org/doc/worse-is-better.html) situation making the creation of tutorial-style documentation seem like a relatively low-value activity since all the needed information is already out there somewhere and duplicating it in a tutorial increases the maintenance burden. I'd recommend starting with [Nicolas Rougier's tutorial](http://www.labri.fr/perso/nrougier/teaching/matplotlib/) over the ones on [matplotlib.org](http://matplotlib.org/users/tutorials.html).
 
 # Conclusion
 
-I'm impressed with both tools; they both render beautiful charts. As I mentioned in the intro I'd lean towards Gnuplot for simpler, quicker tasks since it so convenient and concise, and towards matplotlib for fancier stuff, since it seems like everything imaginable is customizable if you pound your head against the docs for a bit. When each chart is defined in a separate script Gnuplot is kicky fast compared to matplotlib, I think largely due to the time it takes to import all the matplotlib libraries; it probably doesn't matter but it still bolsters my warm feelings of convenience for Gnuplot.
+I'm impressed with both tools; they both render beautiful charts. As I mentioned in the intro I'd lean towards gnuplot for simpler, quicker tasks since it so convenient and concise, and towards matplotlib for fancier stuff, since it seems like everything imaginable is customizable if you pound your head against the docs for a bit. When each chart is defined in a separate script gnuplot is kicky fast compared to matplotlib, I think largely due to the time it takes to import all the matplotlib libraries; it probably doesn't matter but it still bolsters my warm feelings of convenience for gnuplot.
 
 # Appendix: pandas
 
@@ -574,11 +599,12 @@ I'm impressed with both tools; they both render beautiful charts. As I mentioned
 
 pandas provides a wrapper for matplotlib that works very well for simple cases but isn't flexible enough to make a chart similar to the stacked-bar histograms above. Here's a script where I use matplotlib directly instead: [shellhist_pandas.py](/post/histogram_gnuplot_vs_matplotlib/shellhist_pandas.py).
 
-[^using]: A description of the `using` clause of the plot command can be found in the "Commands > Plot > Data > Using" section of [Gnuplot's manual](http://gnuplot.info/docs_5.0/gnuplot.pdf). The manual is an excellent reference but isn't obviously a tutorial, and before reading most of it I had trouble finding the information I needed. I wish it was in HTML so I could link directly to relevant sections, but it's only published in PDF so the best I can do is provide section breadcrumbs.
-[^smooth]: The "Commands > Plot > Data > Smooth > Frequency" section of the Gnuplot manual has an example of plotting a histogram with the `lines` plotting style.
+[^using]: A description of the `using` clause of the plot command can be found by entering `help using` at the gnuplot prompts or in the "Commands > Plot > Data > Using" section of [gnuplot's manual](http://gnuplot.info/docs_5.0/gnuplot.pdf). The manual is an excellent reference but isn't obviously a tutorial, and before reading most of it I had trouble finding the information I needed. If it was published in HTML I'd link directly to relevant sections, but it's only published in PDF so I've provided section breadcrumbs and `help` command keywords.
+[^smooth]: `help smooth freq` and the "Commands > Plot > Data > Smooth > Frequency" section of the gnuplot manual have an example of plotting a histogram with the `lines` plotting style.
 [^leap]: Note that one limitation of rounding the epoch seconds time representation like this is that leap seconds aren't taken into account. If leap second accuracy is required for your application a different approach is needed.
-[^time_repr]: See the "Gnuplot > Time/Date Data" section of the manual.
-[^macros]: See the "Gnuplot > Substitution and Command line macros" section of the manual.
+[^time_repr]: See the "Gnuplot > Time/Date Data" section of the manual or `help time/date`.
+[^sum]: See the "Gnuplot > Expressions > Summation" section of the manual or `help sum`.
+[^macros]: See the "Gnuplot > Substitution and Command line macros" section of the manual or `help macros`.
 [^timezone]: See the default value of the `timezone` setting in the [sample `matplotlibrc`](http://matplotlib.org/users/customizing.html#matplotlibrc-sample) and the discussion of timezones in the [`matplotlib.dates` docs](http://matplotlib.org/api/dates_api.html#module-matplotlib.dates).
 [^tzlocal]: `dateutil.tz.tzlocal` returns a `datetime.tzinfo`-conforming object for the local time zone.
 [^diyfmt]: Alternatively, it's straightforward to stick with Unix times and use `matplotlib.dates.FuncFormatter` and `MultipleLocator` instead, but I'm trying to go with the grain of matplotlib.

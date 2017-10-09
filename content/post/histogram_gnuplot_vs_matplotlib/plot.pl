@@ -7,17 +7,12 @@ use File::Temp;
 my $text_color = '#a0caf5';
 my $bg_color = '#101f2f';
 my $gnuplot_style = <<"EOF";
-set term svg size 800,600 background "$bg_color"
-set style line 50 lt 1 lc rgb "$text_color" lw 1
-set border ls 50
-set xlabel textcolor rgb "$text_color"
-set ylabel textcolor rgb "$text_color"
-set key textcolor rgb "$text_color"
-set title textcolor rgb "$text_color"
+load 'style_torbosite.gp'
+set term svg size 800,600 background bg_color fontscale 1.2
 EOF
 
 my $s = do {local(@ARGV, $/) = 'index.md'; <>};
-while ($s =~ /^`shellhist_([^.]*).(gnuplot|py)`:\n\n((?: .*\n|\n)+)/mg) {
+while ($s =~ /^`shellhist_([^.]*).(gp|py)`:\n\n((?: .*\n|\n)+)/mg) {
     my ($chart_name, $filetype, $contents) = ($1, $2, $3);
     $contents =~ s/^ {4}//gm;
     print "$chart_name, $filetype\n";
@@ -25,7 +20,7 @@ while ($s =~ /^`shellhist_([^.]*).(gnuplot|py)`:\n\n((?: .*\n|\n)+)/mg) {
     my $svg = "shellhist_$chart_name.svg";
 
 
-    if ($filetype eq 'gnuplot') {
+    if ($filetype eq 'gp') {
         print {$tmp} $gnuplot_style, $contents;
         close $tmp or die "$!";
         system("gnuplot $tmp >$svg");
