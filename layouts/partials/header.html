@@ -12,6 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {{.Hugo.Generator}}
     <meta name="twitter:card" content="summary"/>
+    <meta name="description" content="{{if .IsHome}}{{ $.Site.Params.description }}{{else}}{{.Description}}{{end}}" />
     {{partial "opengraph.html" .}}
     {{partial "clicky.html"}}
     {{partial "favicon"}}
