@@ -4,7 +4,7 @@
 <time>{{.Date.Format "2006-01-02"}}</time>
 </header>
 {{if .Params.toc}}
-  {{.TableOfContents}}
+  <aside>{{.TableOfContents}}</aside>
 {{end}}
 {{.Content}}
 <hr>
