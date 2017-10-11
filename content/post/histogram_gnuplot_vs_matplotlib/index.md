@@ -1,5 +1,5 @@
 +++
-title = "Time-series histograms: gnuplot vs matplotlib"
+title = "Histograms of timestamped data: gnuplot vs matplotlib"
 date = "2017-07-16"
 tags = ["data", "visualization", "gnuplot", "python", "perl", "numpy", "matplotlib", "charting", "time"]
 description = "A tutorial on creating time-binned histogram charts using gnuplot and matplotlib, and some of the tradeoffs between the two tools."
@@ -7,16 +7,6 @@ toc = true
 images = ["/post/histogram_gnuplot_vs_matplotlib/preview.png"]
 aliases = ["/post/gnuplot_time_series_histogram_tutorial/"]
 +++
-
-**Update 2017-08-15**: Added an [appendix](#appendix-pandas) discussing the use of [pandas](http://pandas.pydata.org/pandas-docs/stable/index.html).
-
-**Update 2017-10-09**:
-
-- Added a nice way to make a stacked bar chart for multiple distributions using gnuplot, after discovering the `sum [min:max:step] <expr>` syntax.
-- Added `help` commands to be entered at the gnuplot prompt for easier access to relevant documentation.
-- Added the excellent [Gnuplot in Action](https://www.manning.com/books/gnuplot-in-action-second-edition) as an important resource for learning gnuplot.
-- Removed discussion of colour in gnuplot as it's mostly irrelevant to the task at hand and there's several good ways to change colours that aren't difficult to find. See `help colors`.
-- Made the "sum" line more distinct by making it dotted.
 
 # Introduction
 
@@ -26,9 +16,9 @@ I wanted to learn a charting tool that is:
 - fast enough to visualize large datasets, maybe millions of points
 - scriptable, so chart source code plays well with version control
 
-Without doing much research on the options I decided to start with the venerable gnuplot. Data I've needed to analyze at previous jobs have always been time-series, so I chose visualizing my bash history as a practice task. After working through a series of charts of increasing sophistication with gnuplot I started worrying that other tools might be more convenient, so I replicated my gnuplot journey with matplotlib. In the end my worries were unfounded and I'm actually pretty happy with gnuplot, especially for quick-and-dirty jobs. matplotlib certainly has some advantages, like having a popular, sensible language like Python as its interface, and possibly being an alternative to R when used along with [pandas](http://pandas.pydata.org/pandas-docs/stable/index.html), but gnuplot's brevity is difficult to resist.
+Without doing much research on the options I decided to start with the venerable gnuplot. Data I've needed to analyze at previous jobs have always been time series or event streams, so I chose visualizing my bash history as a practice task. After working through a series of charts of increasing sophistication with gnuplot I started worrying that other tools might be more convenient, so I replicated my gnuplot journey with matplotlib. In the end my worries were unfounded and I'm actually pretty happy with gnuplot, especially for quick-and-dirty jobs. matplotlib certainly has some advantages, like having a popular, sensible language like Python as its interface, and possibly being an alternative to R when used along with [pandas](http://pandas.pydata.org/pandas-docs/stable/index.html), but gnuplot's brevity is difficult to resist.
 
-I've been disappointed with the resources I've found for charting time-series data in both gnuplot and matplotlib, motivating me to share my experience.
+I've been disappointed with the resources I've found for charting timestamped data in both gnuplot and matplotlib, motivating me to share my experience.
 
 If you're less interested in the progression and just want to see how I'd recommend making a chart like the below from a timestamped log, skip [here](#multiple-distributions-stacked-bars).
 
@@ -208,7 +198,7 @@ There are some minor changes, too, like the formatting options for the boxes, an
 
 ### External reshaping
 
-An alternative method is to reshape the data using some other tool so gnuplot's histogram plot style can be used. For this data this approach is a lot more work than using inline transformations, but I bet there are situations where it's appropriate.
+An alternative method is to reshape the data using some other tool so gnuplot's histogram plot style can be used. For this data this approach is a lot more work than using inline transformations, but there are certainly situations where it's appropriate.
 
 We're taking the data from this shape:
 
@@ -598,6 +588,21 @@ I'm impressed with both tools; they both render beautiful charts. As I mentioned
     binned = piv.resample('{}S'.format(seconds)).sum().fillna(0)
 
 pandas provides a wrapper for matplotlib that works very well for simple cases but isn't flexible enough to make a chart similar to the stacked-bar histograms above. Here's a script where I use matplotlib directly instead: [shellhist_pandas.py](/post/histogram_gnuplot_vs_matplotlib/shellhist_pandas.py).
+
+# Appendix: changelog
+
+**2017-08-15**: Added an [appendix](#appendix-pandas) discussing the use of [pandas](http://pandas.pydata.org/pandas-docs/stable/index.html).
+
+**2017-10-09**:
+
+- Added a nice way to make a stacked bar chart for multiple distributions using gnuplot, after discovering the `sum [min:max:step] <expr>` syntax.
+- Added `help` commands to be entered at the gnuplot prompt for easier access to relevant documentation.
+- Added the excellent [Gnuplot in Action](https://www.manning.com/books/gnuplot-in-action-second-edition) as an important resource for learning gnuplot.
+- Removed discussion of colour in gnuplot as it's mostly irrelevant to the task at hand and there's several good ways to change colours that aren't difficult to find. See `help colors`.
+- Made the "sum" line more distinct by making it dotted.
+
+**2017-10-11**: Previously I was using the term "time series" loosely to refer to timestamped data in general, but it usually refers to data that are equally spaced in time. "Event stream" is more applicable to the data used here.
+
 
 [^using]: A description of the `using` clause of the plot command can be found by entering `help using` at the gnuplot prompts or in the "Commands > Plot > Data > Using" section of [gnuplot's manual](http://gnuplot.info/docs_5.0/gnuplot.pdf). The manual is an excellent reference but isn't obviously a tutorial, and before reading most of it I had trouble finding the information I needed. If it was published in HTML I'd link directly to relevant sections, but it's only published in PDF so I've provided section breadcrumbs and `help` command keywords.
 [^smooth]: `help smooth freq` and the "Commands > Plot > Data > Smooth > Frequency" section of the gnuplot manual have an example of plotting a histogram with the `lines` plotting style.
