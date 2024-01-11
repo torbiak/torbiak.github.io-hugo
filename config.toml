@@ -6,3 +6,8 @@ footnoteReturnLinkContents = "^"
   author = "Jordan Torbiak"
   description = "Articles and projects"
   card_image = "img/card.png"
+[markup]
+  [markup.tableOfContents]
+    endLevel = 2
+    ordered = false
+    startLevel = 1

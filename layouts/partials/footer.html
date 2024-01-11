@@ -2,7 +2,9 @@
   <nav>
     <div>
       <a href="/">Home</a></span>
-      <a href="{{.Site.RSSLink}}">RSS</a>
+      {{with .OutputFormats.Get "rss" -}}
+        <a href="{{.RelPermalink}}">RSS</a>
+      {{end}}
     </div>
     <span>&copy;2017</span>
   </nav>

@@ -3,10 +3,8 @@
 <section class="posts">
   <h1><a name="posts">Posts</a></h1>
   <ul class="list-unstyled">
-  {{range where .Data.Pages "Section" "post"}}
-    {{if not .Draft}}
-    <li><time>{{.Date.Format "2006-01-02"}}</time> <a href="{{.URL}}">{{.Title}}</a></li>
-    {{end}}
+  {{range where .Site.RegularPages "Section" "post"}}
+    <li><time>{{.Date.Format "2006-01-02"}}</time> <a href="{{.RelPermalink}}">{{.Title}}</a></li>
   {{end}}
   </ul>
 </section>
