@@ -2,7 +2,7 @@
   box-sizing: border-box;
 }
 html {
-  font-size: 125%;
+  font-size: 115%;
 }
 body {
   background-color: #101f2f;
@@ -19,13 +19,17 @@ ul, p, img, pre {
 
 #container {
   width: 100%;
-  max-width: 800px;
+  max-width: 1200px;
   margin-left: 5rem;
 }
 
 
 /* Maybe there's a better cutoff than 1000px. */
 @media (max-width: 1000px) {
+  html {
+    font-size: 95%;
+  }
+
   #container {
     margin: 0;
     max-width: none;
