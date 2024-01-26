@@ -7,7 +7,7 @@ description = "How I chose readable colors for the terminal and configured Vim t
 toc = true
 +++
 
-In short, I've settled on a dark 4-bit terminal palette that is readable for the default and black background colors and use other techniques to workaround unreadable foreground/background combinations, which are mostly when two relatively light colors are put together. I do `:set t_Co = 16` in my vimrc so `colortemplate`-based themes use the terminal palette instead of the absolute 8-bit color model, and use autocommands to modify Vim highlight groups that colorthemes often set to an unreadable combination of my colors.
+In short, I've settled on a dark 4-bit terminal palette that is readable for the default and black background colors and use other techniques to workaround unreadable foreground/background combinations, which are mostly when two relatively light colors are put together. I do `:set t_Co=16` in my vimrc so `colortemplate`-based themes use the terminal palette instead of the absolute 8-bit color model, and use autocommands to modify Vim highlight groups that colorthemes often set to an unreadable combination of my colors.
 
 Warning, I just learned a lot of the stuff in this post, and it's difficult to make definitive statements about terminals due to their long history and multitude of implementations, so I bet I'm kinda wrong or at least not-technically-correct about a lot of this. Don't trust me too much. Also, I'm writing this from a perspective of using classic Vim on Linux.
 
@@ -54,7 +54,7 @@ Changing the color palette is different for each terminal. My terminal's config 
 
 # Configuring Vim
 
-Back in Vim v7.0, the builtin colorthemes used color names from `:help cterm-colors` for color terminals, which are interpreted differently depending on `t_Co` (explained shortly), and 24-bit color for the GUI. And in Dec 2023 (Vim v9.1) the builtin themes were rewritten using the [colortemplate plugin](https://github.com/lifepillar/vim-colortemplate), and now each has specific support for 256, 16, 8, and 2 colors. The builtin themes still choose how many colors to use based on the `t_Co` option, which represents the max number of colors that the terminal supports (up to 256) and is retrieved from the terminfo db (see the `Co` capability in `terminfo(5)`) based on the value of the `TERM` environment variable, but you can override `t_Co` in your vimrc to get themes to use a lower-fidelity color model if desired. (True color, on the other hand, [is advertised by terminals in various ways](https://github.com/termstandard/colors#checking-for-colorterm) and can be enabled in `vim` with `:set termguicolors`.) So, the easiest way to get Vim to use the terminal's 4-bit palette is to do `:set t_Co = 16` in your vimrc.
+Back in Vim v7.0, the builtin colorthemes used color names from `:help cterm-colors` for color terminals, which are interpreted differently depending on `t_Co` (explained shortly), and 24-bit color for the GUI. And in Dec 2023 (Vim v9.1) the builtin themes were rewritten using the [colortemplate plugin](https://github.com/lifepillar/vim-colortemplate), and now each has specific support for 256, 16, 8, and 2 colors. The builtin themes still choose how many colors to use based on the `t_Co` option, which represents the max number of colors that the terminal supports (up to 256) and is retrieved from the terminfo db (see the `Co` capability in `terminfo(5)`) based on the value of the `TERM` environment variable, but you can override `t_Co` in your vimrc to get themes to use a lower-fidelity color model if desired. (True color, on the other hand, [is advertised by terminals in various ways](https://github.com/termstandard/colors#checking-for-colorterm) and can be enabled in `vim` with `:set termguicolors`.) So, the easiest way to get Vim to use the terminal's 4-bit palette is to do `:set t_Co=16` in your vimrc.
 
 When testing out Vim color themes I'd recommend using `:highlight` to check highlight groups to identify unreadable highlight groups early. The most important ones are on the first page, and most other highlight groups will link to them.
 
@@ -73,7 +73,7 @@ In my vimrc:
         ...
     augroup END
 
-One downside to using terminal colors is that themes on the opposite side of the light/dark spectrum probably won't work well . My terminal colors don't work well with light colorschemes, so if did want to use a light theme I'd either `:set t_Co = 256` or choose a light set of terminal colors.
+One downside to using terminal colors is that themes on the opposite side of the light/dark spectrum probably won't work well . My terminal colors don't work well with light colorschemes, so if did want to use a light theme I'd either `:set t_Co=256` or choose a light set of terminal colors.
 
 Second, I find the diff highlight groups to be unreadable for a lot of themes. A quick way to mitigate this is to set `:syntax off`, and depending on how busy the syntax highlighting is for changed lines that might be necessary, but I've been able to avoid doing so lately by overriding the relevant highlight groups, using a black background for `DiffChange` instead of something more colorful:
 
