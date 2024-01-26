@@ -16,6 +16,14 @@ ul, p, img, pre {
   margin: 0.6rem 0;
 }
 
+table, th, td {
+    border: 1px solid;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 0.5rem;
+}
+
 
 #container {
   width: 100%;
