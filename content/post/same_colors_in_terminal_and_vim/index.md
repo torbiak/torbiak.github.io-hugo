@@ -1,6 +1,7 @@
 +++
 title = "Using the same colors for the terminal and Vim"
 date = "2024-01-25"
+aliases = ['choosing_terminal_colors']
 tags = ["terminal", "vim", "color"]
 description = "How I chose readable colors for the terminal and configured Vim to use them."
 toc = true
