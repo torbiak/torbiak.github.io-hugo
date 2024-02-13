@@ -6,6 +6,7 @@ description = "A tutorial on creating time-binned histogram charts using gnuplot
 toc = true
 images = ["/post/histogram_gnuplot_vs_matplotlib/preview.png"]
 aliases = ["/post/gnuplot_time_series_histogram_tutorial/"]
+last_updated = "2017-10-11"
 +++
 
 # Introduction
@@ -214,7 +215,7 @@ to this:
     <bin>   5   2
     ...
 
-I was almost able to reshape the data with [`mlr`](http://johnkerl.org/miller/doc/index.html) but ended up using perl. It's mostly a matter of counting frequencies per command for each bin, sorting the commands by frequency using a [Schwartzian transform](https://en.wikipedia.org/wiki/Schwartzian_transform) so it's easy to print the top N commands, and then printing out all the bins. See the [appendix about pandas](#appendix-pandas) for a far more concise way to do this.
+I was almost able to reshape the data with [`mlr`](http://johnkerl.org/miller/doc/index.html) but ended up using perl. It's mostly a matter of counting frequencies per command for each bin, sorting the commands by frequency using a [Schwartzian transform](https://en.wikipedia.org/wiki/Schwartzian_transform) so it's easy to print the top N commands, and then printing out all the bins. See the [addendum about pandas](#addendum-pandas) for a far more concise way to do this.
 
 `bin.pl`:
 
@@ -581,7 +582,7 @@ I learned what I know about matplotlib by stumbling through the official docs, w
 
 I'm impressed with both tools; they both render beautiful charts. As I mentioned in the intro I'd lean towards gnuplot for simpler, quicker tasks since it so convenient and concise, and towards matplotlib for fancier stuff, since it seems like everything imaginable is customizable if you pound your head against the docs for a bit. When each chart is defined in a separate script gnuplot is kicky fast compared to matplotlib, I think largely due to the time it takes to import all the matplotlib libraries; it probably doesn't matter but it still bolsters my warm feelings of convenience for gnuplot.
 
-# Appendix: pandas
+# Addendum: pandas
 
 [pandas](http://pandas.pydata.org/pandas-docs/stable/index.html) is a data analysis toolkit for Python and it has some particularly convienient functions for pivoting and rolling up the data. Assuming the times and commands have already been extracted from the datafile as equal-length lists of strings named `times` and `cmds`, the data can be binned and pivoted into a wide format like this:
 
@@ -593,9 +594,9 @@ I'm impressed with both tools; they both render beautiful charts. As I mentioned
 
 pandas provides a wrapper for matplotlib that works very well for simple cases but isn't flexible enough to make a chart similar to the stacked-bar histograms above. Here's a script where I use matplotlib directly instead: [shellhist_pandas.py](/post/histogram_gnuplot_vs_matplotlib/shellhist_pandas.py).
 
-# Appendix: changelog
+# Addendum: changelog
 
-**2017-08-15**: Added an [appendix](#appendix-pandas) discussing the use of [pandas](http://pandas.pydata.org/pandas-docs/stable/index.html).
+**2017-08-15**: Added an [addendum](#addendum-pandas) discussing the use of [pandas](http://pandas.pydata.org/pandas-docs/stable/index.html).
 
 **2017-10-09**:
 
