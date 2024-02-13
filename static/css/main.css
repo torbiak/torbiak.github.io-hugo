@@ -111,7 +111,7 @@ hr {
 
 /* Post header. */
 #PageTitle { font-size: 150%; }
-header time {
+header .time_meta {
   color: #406a95;
   font-size: 80%;
 }

@@ -1,7 +1,14 @@
 {{partial "header.html" .}}
 <header>
 <h1 id="PageTitle">{{.Title}}</h1>
-<time>{{.Date.Format "2006-01-02"}}</time>
+{{if .Params.last_updated}}
+<p class="time_meta">
+Published: <time>{{.Date.Format "2006-01-02"}}</time>
+<br>Last updated: <time>{{.Params.last_updated}}</time>
+</p>
+{{else}}
+<p class="time_meta"><time>{{.Date.Format "2006-01-02"}}</time></p>
+{{end}}
 </header>
 {{if .Params.toc}}
   <aside>{{.TableOfContents}}</aside>
