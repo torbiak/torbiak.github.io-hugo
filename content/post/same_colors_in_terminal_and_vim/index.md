@@ -5,7 +5,7 @@ aliases = ['choosing_terminal_colors']
 tags = ["terminal", "vim", "color"]
 description = "How I chose readable colors for the terminal and configured Vim to use them."
 toc = true
-last_updated = "2024-02-12"
+updated = "2024-02-12"
 +++
 
 In short, I've settled on a dark 4-bit terminal palette that is readable for the default and black background colors and use other techniques to workaround unreadable foreground/background combinations, which are mostly when two relatively light colors are put together. I do `:set t_Co=16` in my vimrc so themes that check it use the terminal palette instead of the absolute 8-bit color model, and use autocommands to modify Vim highlight groups that colorschemes often set to an unreadable combination of my colors. And in the end I wrote a basic colorscheme to suit the terminal colors I chose.

@@ -1,10 +1,10 @@
 {{partial "header.html" .}}
 <header>
 <h1 id="PageTitle">{{.Title}}</h1>
-{{if .Params.last_updated}}
+{{if .Params.updated}}
 <p class="time_meta">
 Published: <time>{{.Date.Format "2006-01-02"}}</time>
-<br>Last updated: <time>{{.Params.last_updated}}</time>
+<br>Updated: <time>{{.Params.updated}}</time>
 </p>
 {{else}}
 <p class="time_meta"><time>{{.Date.Format "2006-01-02"}}</time></p>

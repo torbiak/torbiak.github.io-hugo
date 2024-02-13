@@ -6,7 +6,7 @@ description = "A tutorial on creating time-binned histogram charts using gnuplot
 toc = true
 images = ["/post/histogram_gnuplot_vs_matplotlib/preview.png"]
 aliases = ["/post/gnuplot_time_series_histogram_tutorial/"]
-last_updated = "2017-10-11"
+updated = "2017-10-11"
 +++
 
 # Introduction
