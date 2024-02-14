@@ -49,7 +49,7 @@ I ended up with something like in the image of 4TCSD above. Unfortunately, 4TCSD
 
 # Configuring the terminal
 
-Permanently changing the color palette is different for each terminal. My terminal's config format wasn't supported by 4TCSD and I couldn't find any other tools to convert between formats on the command line so I wrote a quick-and-dirty script in Python called [`conv4bit`](https://github.com/torbiak/conv4bit/blob/main/conv4bit.py). Alternatively, terminal.sexy supports different export formats than 4TCSD, so exporting for xterm from 4TCSD and importing that as Xresources in terminal.sexy might be helpful.
+Permanently changing the color palette is different for each terminal. My terminal's config format wasn't supported by 4TCSD and I initially couldn't find any other tools to convert between formats on the command line so I wrote a quick-and-dirty script in Python called [`conv4bit`](https://github.com/torbiak/conv4bit/blob/main/conv4bit.py). Later I realized that the converter for terminal.sexy also has a command-line interface: [termcolors](https://github.com/stayradiated/termcolors). terminal.sexy supports different export formats than 4TCSD, so exporting for xterm from 4TCSD and importing that as Xresources in terminal.sexy might be helpful.
 
 A lot of terminals support using xterm-style OSC 4/10/11/12 escapes to change the 4-bit palette on-the-fly, which is especially convenient for trying out and editing themes. I had fun cloning the [Gogh](https://github.com/Gogh-Co/Gogh) repo, applying one of its themes with `conv4bit -ofmt osc "themes/${theme:?}" -`, and then attaching to an existing tmux session to preview the theme in a variety of situations.
 
@@ -164,6 +164,10 @@ forbit doesn't pass the `$VIMRUNTIME/colors/tools/check_colors.vim` script, whic
 - [Consistent terminal colors with 16-ANSI-color Vim themes](https://jeffkreeftmeijer.com/vim-16-color/)
 discusses a different approach: instead of setting `t_Co`, Jeff wrote a colorscheme that uses 4-bit color numbers directly and redefines all the highlight groups that are defined by default. Vim maps the `cterm-colors` names to numbers based on `t_Co`, and the default colorscheme is specified in terms of color names, so if `t_Co == 256` then some of the highlight groups will start out with colors in the 8-bit space from 16-255. I think there could be a small downside to this approach in that non-ANSI terminals won't display the colors in the theme as intended, due to the different number-to-color mapping.
 - [Gogh](https://github.com/Gogh-Co/Gogh) has a bunch of 4-bit themes specified in YAML/JSON and includes scripts to install them for various terminals.
+- [4bit Terminal Color Scheme Designer](https://ciembor.github.io/4bit/#) is a streamlined theme creator
+- [terminal.sexy](https://terminal.sexy) is a more free-form theme creator
+- [termcolors](https://github.com/stayradiated/termcolors) is a Javascript theme format converter that supports a bunch of formats
+- [`conv4bit`](https://github.com/torbiak/conv4bit/blob/main/conv4bit.py) is my Python theme format converter that supports a few formats
 
 # Appendix: query if bright background is supported
 
