@@ -4,6 +4,7 @@ date = "2023-12-20"
 tags = ["linux", "pulseaudio", "systemd", "audio", "udev", "bluetooth"]
 description = "How to use a LADSPA compressor filter to normalize volume system-wide, and to use udev rules, a systemd user service, and PulseAudio commands to make the necessary config changes when connecting/disconnecting Bluetooth headphones."
 toc = true
+updated = "2024-03-23"
 +++
 
 # Motivation
@@ -22,7 +23,7 @@ Sorry about the long lines in this and several other snippets, but neither Pulse
 
     .ifexists module-ladspa-sink.so
     .nofail
-    load-module module-ladspa-sink sink_name=compressor plugin=sc4_1882 label=sc4 control=1,1.5,401,-30,20,5,24
+    load-module module-ladspa-sink sink_name=compressor plugin=sc4_1882 label=sc4 control=1,1.5,400,-30,20,5,24
     set-default-sink compressor
     .fail
     .endif
@@ -33,7 +34,7 @@ I'm still using the SC4 filter settings from that Ask Ubuntu answer, except that
 
 - RMS/peak ratio: 1
 - Attack time (ms): 1.5
-- Release time (ms): 401
+- Release time (ms): 400
 - Threshold level (dB): -30
 - Gain reduction ratio (1:n): 20
 - Knee radius: 5
@@ -50,7 +51,7 @@ The above config might be all you need, but I needed to do a bit more to have th
 When you connect Bluetooth headphones a new sink gets added to PulseAudio, but unless we do something our compressor is going to stay routed to our ALSA output or wherever we pointed it at PulseAudio startup, and the output to the headphones won't be filtered. For a few years I was keeping a `pavucontrol` window open and manually rerouting the compressor's output to my headphones after connecting them, but when I set up my new laptop `pavucontrol` no longer gave me a dropdown to do manual routing for LADSPA sinks, and I haven't figured out why yet. So, I started running a little script every time I connected my headphones, which adds another LADSPA sink with the output routed to my headphones. The sink name is based on the headphones' MAC address, and is constant, so I just needed to look it up once using `pactl list short sinks` and provide it as the `sink_master` param.
 
     pacmd <<EOF
-    load-module module-ladspa-sink sink_name=bluetooth_compressor plugin=sc4_1882 label=sc4 sink_master=bluez_sink.00_1B_66_A1_45_12.a2dp_sink control=1,1.5,401,-30,20,5,24
+    load-module module-ladspa-sink sink_name=bluetooth_compressor plugin=sc4_1882 label=sc4 sink_master=bluez_sink.00_1B_66_A1_45_12.a2dp_sink control=1,1.5,400,-30,20,5,24
     set-default-sink bluetooth_compressor
     EOF
 
@@ -151,7 +152,7 @@ But before we get to the udev rule, here's the script that our systemd service c
     start)
         log info 'set bluetooth_compressor as default sink'
         pacmd <<EOF
-    load-module module-ladspa-sink sink_name=bluetooth_compressor plugin=sc4_1882 label=sc4 sink_master=bluez_sink.00_1B_66_A1_45_12.a2dp_sink control=1,1.5,401,-30,20,5,12
+    load-module module-ladspa-sink sink_name=bluetooth_compressor plugin=sc4_1882 label=sc4 sink_master=bluez_sink.00_1B_66_A1_45_12.a2dp_sink control=1,1.5,400,-30,20,5,12
     set-default-sink bluetooth_compressor
     EOF
     ;;
@@ -208,3 +209,7 @@ And surprisingly to me, there's a udev key for running shell commands and captur
 # Good luck
 
 I doubt you got this far unless you're motivated enough to set something similar up on your own machine. Good luck, and I hope this helped.
+
+# Addendum: change log
+
+- 2024-03-23: Change release time from 401ms to 400ms. I must have hit Ctrl-A in Vim and incremented it by one.
