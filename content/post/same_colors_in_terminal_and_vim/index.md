@@ -92,7 +92,7 @@ For diffs this results in:
 
 ![diff example](/post/same_colors_in_terminal_and_vim/diff.png)
 
-One downside to using terminal colors is that themes on the opposite side of the light/dark spectrum probably won't work well . My terminal colors don't work well with light colorschemes, so if did want to use a light theme I'd either use 8 or 24-bit color or choose a light set of terminal colors.
+One downside to using terminal colors is that themes on the opposite side of the light/dark spectrum probably won't work well . My terminal colors don't work well with light colorschemes, so if I did want to use a light theme I'd either use 8 or 24-bit color or choose a light set of terminal colors.
 
 ## Vim's cterm-colors
 
